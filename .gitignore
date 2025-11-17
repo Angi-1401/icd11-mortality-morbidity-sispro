@@ -1,2 +1,4 @@
 *.xlsb
 *.log
+
+!/release/icd11-mortality-morbidity.xlsb
