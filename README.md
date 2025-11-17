@@ -17,9 +17,9 @@ This Excel/VBA-based tool is designed to analyze clinical and hospital reports g
 
 ## Requirements
 
-- **Operating System**: Windows XP or later 
-- **Excel Version**: Microsoft Excel 2010 or later  
-- **Macro Support**: Macros must be enabled  
+- **Operating System**: Windows 10 or later
+- **Excel Version**: Microsoft Excel 2010 or later
+- **Macro Support**: Macros must be enabled
 - **API Credentials**: A valid `CLIENT_ID` and `CLIENT_SECRET` from the [ICD-11 API portal](https://icd.who.int/icdapi) are required
 
 ## Installation
@@ -30,10 +30,10 @@ This Excel/VBA-based tool is designed to analyze clinical and hospital reports g
    ```
 2. Open the `ICD11_Mortality_Morbidity_SISPRO.xlsb` file in Microsoft Excel.
 3. Access the `ICD11.bas` module in the VBA editor (alt + F11) to input your ICD-11 API credentials.
-    ```vba
-    Const CLIENT_ID As String = "YOUR_CLIENT_ID_HERE"
-    Const CLIENT_SECRET As String = "YOUR_CLIENT_SECRET_HERE"
-    ```
+   ```vba
+   Const CLIENT_ID As String = "YOUR_CLIENT_ID_HERE"
+   Const CLIENT_SECRET As String = "YOUR_CLIENT_SECRET_HERE"
+   ```
 4. Save the workbook to retain your credentials.
 
 ## Getting Started
