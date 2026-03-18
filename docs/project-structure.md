@@ -1,17 +1,18 @@
-# Project Structure
+# Estructura del Proyecto
 
-The project is organized into several key directories and files, each serving a specific purpose in the overall functionality of the application.
+El proyecto está organizado en varios directorios y archivos clave, cada uno con un propósito específico en la funcionalidad general de la aplicación.
 
-## Directory Structure
+## Estructura de Directorios
+
 ```
 /ICD11-Mortality-Morbidity-SISPRO
-├── /docs                       ' Docs and project-related documents
-├── /release                    ' Compiled releases of the application
-├── /src                        ' Source code files for VBA modules
-│   ├── /forms                  ' UserForm files
+├── /docs                       ' Documentos y archivos relacionados con el proyecto
+├── /release                    ' Versiones compiladas de la aplicación
+├── /src                        ' Archivos fuente de los módulos VBA
+│   ├── /forms                  ' Archivos de formularios de usuario
 │   │   ├── frmProgress.frm
 │   │   └── frmProgress.frx
-│   └── /modules                ' Main modules
+│   └── /modules                ' Módulos principales
 │       ├── ICD11.bas
 │       ├── ReportOperations.bas
 │       ├── TableOperations.bas
@@ -19,13 +20,14 @@ The project is organized into several key directories and files, each serving a 
 ├── README.md
 └── LICENSE
 ```
-## Considerations for Editing VBA Modules
 
-VBA modules can be edited in any text or code editor, but edits made outside the VBA environment are not automatically applied to the Excel workbook/project.
+## Consideraciones para Editar Módulos VBA
 
-To have those modules reflected in the project you must either:
+Los módulos VBA pueden editarse en cualquier editor de texto o código, pero los cambios realizados fuera del entorno VBA no se aplican automáticamente al libro/proyecto de Excel.
 
-- Manually import/add the module through the Excel VBA Editor (e.g., File → Import File...),
-- Or use a third-party tool that supports importing/exporting VBA modules into the workbook/project.
+Para que esos módulos se reflejen en el proyecto debe:
 
-If a module file is not imported into the VBA project, changes in external files will not affect the workbook.
+- Importar/agregar manualmente el módulo a través del Editor de VBA de Excel (por ejemplo, Archivo → Importar archivo...),
+- O usar una herramienta de terceros que permita importar/exportar módulos VBA al libro/proyecto.
+
+Si un archivo de módulo no se importa al proyecto VBA, los cambios en archivos externos no afectarán al libro.

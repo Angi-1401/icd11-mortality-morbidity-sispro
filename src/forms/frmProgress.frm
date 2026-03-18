@@ -32,14 +32,14 @@ Private Sub UserForm_Initialize()
   CurrentStep = 0
 End Sub
 
-' Updates the progress bar
+' Actualiza la barra de progreso
 Public Sub UpdateProgress(ByVal current As Long, ByVal total As Long)
   Dim pct As Double
   If total <= 0 Then
     pct = 0
   Else
     pct = current / total
-    If pct > 1 Then pct = 1 ' <-- Cap at 100%
+    If pct > 1 Then pct = 1 ' <-- Límite al 100%
   End If
   
   lblProgress.Width = fraProgress.Width * pct
@@ -47,7 +47,7 @@ Public Sub UpdateProgress(ByVal current As Long, ByVal total As Long)
   DoEvents
 End Sub
 
-' Adds a message to the log textbox with optional coloring
+' Agrega un mensaje al cuadro de texto de registro con color opcional
 Public Sub AddLog(timeStamp As String, prefix As String, msg As String, level As LogLevel)
   Dim formattedMsg As String
   formattedMsg = timeStamp & " " & prefix & " " & msg & vbCrLf

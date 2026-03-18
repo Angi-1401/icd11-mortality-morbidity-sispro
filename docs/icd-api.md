@@ -1,32 +1,32 @@
-**Disclaimer: All information presented in this document comes directly from the official [ICD API Documentation](https://icd.who.int/docs/icd-api/APIDoc-Version2/).**
+**Aviso: Toda la información presentada en este documento proviene directamente de la [Documentación oficial de la API ICD](https://icd.who.int/docs/icd-api/APIDoc-Version2/).**
 
-# ICD API
+# API ICD
 
-ICD API allows programmatic access to the International Classification of Diseases (ICD). It is an HTTP based REST API. You may use [this site](https://icd.who.int/icdapi) to access up to date documentation on using the API as well as managing the keys needed for using the API.
+La API ICD permite el acceso programático a la Clasificación Internacional de Enfermedades (ICD). Es una API REST basada en HTTP. Puede usar [este sitio](https://icd.who.int/icdapi) para acceder a la documentación actualizada sobre el uso de la API, así como para gestionar las claves necesarias para su uso.
 
-All communication made to the APIs are encrypted (i.e. only https is allowed). All http requests will be automatically redirected to the https variants.
+Toda la comunicación realizada con las APIs está cifrada (es decir, solo se permite https). Todas las solicitudes http se redirigirán automáticamente a sus variantes https.
 
-Even though there is this automated redirection, we recommend directly calling to the https endpoints as this will work faster
+Aunque existe esta redirección automática, recomendamos llamar directamente a los endpoints https ya que funcionará más rápido.
 
-## API Access
+## Acceso a la API
 
-In order to be able to use the ICD APIs, first you need to create an account on the ICD API Home page: https://icd.who.int/icdapi
+Para poder usar las APIs de ICD, primero debe crear una cuenta en la página principal de la API ICD: https://icd.who.int/icdapi
 
-The APIs use OAuth 2 client credentials for authentication. Once you register and login to this site, you could get a client id and client secret to be used for authentication. This is done by clicking on the View API access key link.
+Las APIs utilizan credenciales de cliente OAuth 2 para la autenticación. Una vez que se registre e inicie sesión en este sitio, podrá obtener un client id y client secret para autenticarse. Esto se realiza haciendo clic en el enlace "View API access key".
 
-Token Endpoint for the service is located at: 
+El endpoint de token para el servicio se encuentra en:
 
 ```url
 https://icdaccessmanagement.who.int/connect/token
 ```
 
-More information on authentication can be found in the [ICD API Authentication](https://icd.who.int/docs/icd-api/API-Authentication/) document
+Puede encontrar más información sobre autenticación en el documento [ICD API Authentication](https://icd.who.int/docs/icd-api/API-Authentication/)
 
-All communication made to the access management site and the APIs are encrypted (i.e. only https is allowed) However if you refer to the http variants of the URLs, they will be automatically redirected.
+Toda la comunicación realizada con el sitio de gestión de acceso y las APIs está cifrada (solo https). Sin embargo, si utiliza las variantes http de las URLs, serán redirigidas automáticamente.
 
-## How to obtain an SECRET_ID and SECRET_KEY from the ICD API
+## Cómo obtener un SECRET_ID y SECRET_KEY de la API ICD
 
-1. Access the ICD API Home page: https://icd.who.int/icdapi
-2. Create an account and login to the site.
-3. Click on the View API access key link.
-4. Retrieve your credentials and store them in a secure place.
+1. Acceda a la página principal de la API ICD: https://icd.who.int/icdapi
+2. Cree una cuenta e inicie sesión en el sitio.
+3. Haga clic en el enlace "View API access key".
+4. Recupere sus credenciales y guárdelas en un lugar seguro.

@@ -1,10 +1,10 @@
 Attribute VB_Name = "ICD11"
 Option Explicit
 
-Public Const CLIENT_ID As String = "YOUR_CLIENT_ID_HERE"
-Public Const CLIENT_SECRET As String = "YOUR_CLIENT_SECRET_HERE"
+Public Const CLIENT_ID As String = "TU_CLIENT_ID_AQUI"
+Public Const CLIENT_SECRET As String = "TU_CLIENT_SECRET_AQUI"
 
-' Extracts a possible ICD-11 code from a string that contains a dash before the code.
+' Extrae un posible código ICD-11 de una cadena que contiene un guion antes del código.
 Public Function ExtractICD11Code(ByVal str As String) As String
   Dim dashPos As Long
   Dim segment As String
@@ -22,18 +22,18 @@ Public Function ExtractICD11Code(ByVal str As String) As String
   code = ""
   For i = 1 To Len(segment)
     ch = Mid$(segment, i, 1)
-    ' Allows letters, numbers, spaces, ampersands, slashes, and dots
+    ' Permite letras, números, espacios, ampersands, barras y puntos
     If ch Like "[A-Za-z0-9 &/\.]" Then
       code = code & ch
     End If
   Next i
 
-  ' Replace spaces by dots
+  ' Reemplaza espacios por puntos
   code = Replace(code, " ", ".")
   ExtractICD11Code = code
 End Function
 
-' Retrieves the label of an ICD-11 code using the description endpoint.
+' Recupera la etiqueta de un código ICD-11 usando el endpoint de descripción.
 Public Function GetICD11CodeLabel(ByVal code As String) As String
   Dim http As Object
   Dim token As String
@@ -56,7 +56,7 @@ Public Function GetICD11CodeLabel(ByVal code As String) As String
     Exit Function
   End If
 
-  ' URL encode for problematic characters
+  ' Codifica en URL los caracteres problemáticos
   code = Replace(code, "&", "%26")
   code = Replace(code, "/", "%2F")
   code = Replace(code, " ", "%20")
@@ -112,7 +112,7 @@ Private Function GetICD11AccessToken() As String
 
   On Error GoTo ErrHandler
 
-  ' Use cached toked if still valid
+  ' Usa el token en caché si aún es válido
   If cachedToken <> "" And Now < tokenExpiry Then
     GetICD11AccessToken = cachedToken
     Exit Function
@@ -146,12 +146,12 @@ Private Function GetICD11AccessToken() As String
     On Error Resume Next
     expiresIn = CLng(Trim(expiresInText))
     If Err.Number <> 0 Then
-      ' If it could not be parsed, use 300 seconds by default.
+      ' Si no se pudo analizar, usa 300 segundos por defecto.
       expiresIn = 300
       Err.Clear
     End If
     On Error GoTo 0
-    tokenExpiry = DateAdd("s", expiresIn - 60, Now) ' 60s as buffer
+    tokenExpiry = DateAdd("s", expiresIn - 60, Now) ' 60s como buffer
     GetICD11AccessToken = cachedToken
   Else
     LogMessage "GetICD11AccessToken: access_token not found in response. JSON excerpt: " & Left(jsonResponse, 300), LOG_ERROR
@@ -165,7 +165,7 @@ ErrHandler:
   GetICD11AccessToken = ""
 End Function
 
-' Validates basic ICD-11 code format (letters/numbers, with segments separated by periods)
+' Valida el formato básico del código ICD-11 (letras/números, con segmentos separados por puntos)
 Private Function IsValidICD11Code(ByVal code As String) As Boolean
   Dim regex As Object
   Set regex = CreateObject("VBScript.RegExp")
@@ -177,7 +177,7 @@ Private Function IsValidICD11Code(ByVal code As String) As Boolean
   IsValidICD11Code = regex.Test(code)
 End Function
 
-' Extracts value between startTag and endTag. Returns empty string if startTag is not found.
+' Extrae el valor entre startTag y endTag. Devuelve cadena vacía si no se encuentra startTag.
 Private Function ParseJSONValue(ByVal json As String, ByVal startTag As String, ByVal endTag As String) As String
   Dim startPos As Long
   Dim endPos As Long
@@ -188,7 +188,7 @@ Private Function ParseJSONValue(ByVal json As String, ByVal startTag As String, 
 
   startPos = startPos + Len(startTag)
   If endTag = "" Then
-    ' If there is no endTag, we take until the end or until the object closes.
+    ' Si no hay endTag, tomamos hasta el final o hasta que el objeto se cierre.
     endPos = Len(json) + 1
   Else
     endPos = InStr(startPos, json, endTag, vbTextCompare)
@@ -196,25 +196,25 @@ Private Function ParseJSONValue(ByVal json As String, ByVal startTag As String, 
   End If
 
   raw = Mid$(json, startPos, endPos - startPos)
-  ' Remove opening/closing quotation marks if they exist
+  ' Elimina comillas de apertura/cierre si existen
   If Len(raw) >= 2 Then
     If Left$(raw, 1) = """" And Right$(raw, 1) = """" Then
       raw = Mid$(raw, 2, Len(raw) - 2)
     End If
   End If
-  ' Replace escaped quotation marks
+  ' Reemplaza comillas escapadas
   raw = Replace(raw, "\""", """")
   ParseJSONValue = raw
 End Function
 
-' Replaces common \u00xx sequences with accented characters
+' Reemplaza secuencias comunes \u00xx con caracteres acentuados
 Private Function DecodeUnicode(ByVal str As String) As String
   If Len(str) = 0 Then
     DecodeUnicode = str
     Exit Function
   End If
 
-  ' Common characters in Spanish
+  ' Caracteres comunes en español
   str = Replace(str, "\u00E1", "á")
   str = Replace(str, "\u00E9", "é")
   str = Replace(str, "\u00ED", "í")
@@ -228,10 +228,10 @@ Private Function DecodeUnicode(ByVal str As String) As String
   str = Replace(str, "\u00DA", "Ú")
   str = Replace(str, "\u00D1", "Ñ")
 
-  ' Other common characters
+  ' Otros caracteres comunes
   str = Replace(str, "\\/", "/")
-  str = Replace(str, "\u2013", "-") ' en dash
-  str = Replace(str, "\u2014", "-") ' em dash
+  str = Replace(str, "\u2013", "-") ' guion corto
+  str = Replace(str, "\u2014", "-") ' guion largo
 
   DecodeUnicode = str
 End Function

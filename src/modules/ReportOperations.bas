@@ -7,6 +7,7 @@ Public Const OUTPUT_WORKSHEET_NAME As String = "Reports"
 Public Const TABLE_NAME As String = "__datatable__"
 Public Const TARGET_COLUMN As Long = 35
 
+' Borra los datos existentes en el reporte
 Public Sub ClearReport()
   Dim wsOutput As Worksheet
   Dim i As Long
@@ -24,6 +25,7 @@ Public Sub ClearReport()
   MsgBox "Report cleared successfully!", vbInformation
 End Sub
 
+' Genera el reporte de mortalidad y morbilidad basado en los datos de entrada y los filtros definidos.
 Public Sub GenerateReport()
   Dim wsInput As Worksheet, wsOutput As Worksheet
   Dim tbl As ListObject
@@ -42,31 +44,32 @@ Public Sub GenerateReport()
   Dim TotalSteps As Long
   Dim CurrentStep As Long
   
+  ' Inicializa el formulario de progreso
   Set frm = New FrmProgress
   frm.Show vbModeless
   Set Utils.frm = frm
   
   On Error GoTo ErrHandler
-  LogMessage "Starting GenerateReport..."
+  LogMessage "Iniciando GenerateReport..."
   
   Set wsInput = ThisWorkbook.Worksheets(INPUT_WORKSHEET_NAME)
   Set wsOutput = ThisWorkbook.Worksheets(OUTPUT_WORKSHEET_NAME)
   Set tbl = wsInput.ListObjects(TABLE_NAME)
   
   If tbl Is Nothing Or tbl.DataBodyRange Is Nothing Then
-    LogMessage "Error: Input table '" & TABLE_NAME & "' is missing or empty!", LOG_ERROR
+    LogMessage "Error: ¡La tabla de entrada '" & TABLE_NAME & "' es inexistente o está vacía!", LOG_ERROR
     Exit Sub
   End If
   
   data = tbl.DataBodyRange.Value
-  LogMessage "Table loaded. Rows: " & UBound(data, 1) & ", Columns: " & UBound(data, 2)
+  LogMessage "Datos cargados. Filas: " & UBound(data, 1) & ", Columnas: " & UBound(data, 2)
   
   mun = wsOutput.Range("W2").Value
   filters = Array(Array(0, vbNullString), Array(12, "FEMENINO"), Array(12, "MASCULINO"), Array(6, mun))
   outRanges = Array("C6", "C34", "C62", "C90")
   
   If UBound(filters) <> UBound(outRanges) Then
-    LogMessage "Error: Filters and output ranges mismatch!", LOG_ERROR
+    LogMessage "Error: ¡El número de filtros no coincide con el número de rangos de salida!", LOG_ERROR
     Exit Sub
   End If
   
@@ -77,50 +80,53 @@ Public Sub GenerateReport()
   
   DisableApplicationSettings True
   
+  ' Procesa cada filtro y genera el reporte correspondiente
   For i = LBound(filters) To UBound(filters)
     filterCol = filters(i)(0)
     filterVal = filters(i)(1)
-    LogMessage "Processing filter index " & i & ": filterCol=" & filterCol & ", filterVal=" & filterVal
+    LogMessage "Procesando filtro índice " & i & ": filterCol=" & filterCol & ", filterVal=" & filterVal
     
     Set freqDict = BuildFilteredFrequencyDict(data, filterCol, filterVal, TARGET_COLUMN)
-    LogMessage "Frequency dictionary count: " & freqDict.Count
+    LogMessage "Conteo del diccionario de frecuencias: " & freqDict.Count
 
     sortedKeys = freqDict.keys
     SortKeysByFrequencyDescending sortedKeys, freqDict
 
     topArr = GetTopNArray(sortedKeys, 25)
     WriteTopNToRange topArr, wsOutput.Range(outRanges(i)), 25
-    LogMessage "Top N written to " & outRanges(i)
+    LogMessage "Top N escrito en " & outRanges(i)
 
     frm.CurrentStep = frm.CurrentStep + 12
     frm.UpdateProgress frm.CurrentStep, frm.TotalSteps
 
     WriteICD11LabelsToRange topArr, wsOutput.Range(outRanges(i)).Offset(0, 2), frm
-    LogMessage "ICD-11 labels written to " & wsOutput.Range(outRanges(i)).Offset(0, 2).Address
+    LogMessage "Etiquetas ICD-11 escritas en " & wsOutput.Range(outRanges(i)).Offset(0, 2).Address
 
     frm.CurrentStep = frm.CurrentStep + 13
     frm.UpdateProgress frm.CurrentStep, frm.TotalSteps
 
-    LogMessage "Filter index " & i & " processed completely."
+    LogMessage "Índice de filtro " & i & " procesado completamente."
   Next i
 
   DisableApplicationSettings False
   
-  LogMessage "Report generation complete!"
+  LogMessage "¡Generación de reporte completa!"
   frm.UpdateProgress TotalSteps, TotalSteps
-  MsgBox "Report generated successfully!", vbInformation
+  MsgBox "¡Reporte generado exitosamente!", vbInformation
   
   Unload frm
   Exit Sub
   
 ErrHandler:
   DisableApplicationSettings False
-  MsgBox "Error in GenerateReport: " & Err.Description, vbCritical
-  LogMessage "Error in GenerateReport: " & Err.Description, LOG_ERROR
+  MsgBox "Error en GenerateReport: " & Err.Description, vbCritical
+  LogMessage "Error en GenerateReport: " & Err.Description, LOG_ERROR
   On Error Resume Next
   Unload frm
 End Sub
 
+' Construye un diccionario de frecuencias para los valores en targetCol,
+' opcionalmente filtrando por filterCol = filterVal.
 Private Function BuildFilteredFrequencyDict(ByVal data As Variant, _
   ByVal filterCol As Long, ByVal filterVal As Variant, _
   ByVal targetCol As Long) As Object
@@ -133,22 +139,23 @@ Private Function BuildFilteredFrequencyDict(ByVal data As Variant, _
   colsCount = UBound(data, 2)
   Set dict = CreateObject("Scripting.Dictionary")
   
-  LogMessage "Building frequency dictionary... TargetCol=" & targetCol & ", FilterCol=" & filterCol
+  LogMessage "Construyendo diccionario de frecuencias... TargetCol=" & targetCol & ", FilterCol=" & filterCol
   
   If targetCol > colsCount Or targetCol < 1 Then
-    LogMessage "TARGET_COLUMN out of range! Max columns=" & colsCount, LOG_ERROR
+    LogMessage "¡TARGET_COLUMN fuera de rango! Máximo de columnas=" & colsCount, LOG_ERROR
     Set BuildFilteredFrequencyDict = dict
     Exit Function
   End If
   
   If filterCol <> 0 Then
     If filterCol > colsCount Or filterCol < 1 Then
-      LogMessage "Error: Filter column out of range! Max columns=" & colsCount, LOG_ERROR
+      LogMessage "Error: ¡Columna de filtro fuera de rango! Máximo de columnas=" & colsCount, LOG_ERROR
       Set BuildFilteredFrequencyDict = dict
       Exit Function
     End If
   End If
   
+  ' Recorre cada fila y cuenta las frecuencias de los valores en targetCol, aplicando el filtro si es necesario
   For r = 1 To rowsCount
     val = data(r, targetCol)
     If Not IsError(val) Then
@@ -171,6 +178,7 @@ Private Function BuildFilteredFrequencyDict(ByVal data As Variant, _
   Set BuildFilteredFrequencyDict = dict
 End Function
 
+' Ordena un array de claves basado en las frecuencias almacenadas en freqDict, de mayor a menor.
 Private Function SortKeysByFrequencyDescending(ByRef keys As Variant, ByVal freqDict As Object)
   Dim i As Long, j As Long, tmp As Variant
   If Not IsArray(keys) Then Exit Function
@@ -187,6 +195,7 @@ Private Function SortKeysByFrequencyDescending(ByRef keys As Variant, ByVal freq
   Next i
 End Function
 
+' Obtiene los primeros N elementos de un array, o todos si el array tiene menos de N elementos.
 Private Function GetTopNArray(ByVal arr As Variant, Optional ByVal n As Long = 25) As Variant
   Dim lim As Long, i As Long
   Dim res() As Variant
@@ -212,6 +221,7 @@ Private Function GetTopNArray(ByVal arr As Variant, Optional ByVal n As Long = 2
   GetTopNArray = res
 End Function
 
+' Escribe un array de valores en una columna a partir de una celda inicial, limitando a N filas.
 Private Sub WriteTopNToRange(ByVal arr As Variant, ByVal startCell As Range, Optional ByVal n As Long = 25)
   Dim lim As Long, i As Long
   Dim outputArr() As Variant
@@ -230,6 +240,8 @@ Private Sub WriteTopNToRange(ByVal arr As Variant, ByVal startCell As Range, Opt
   startCell.Resize(lim, 1).Value = outputArr
 End Sub
 
+' Escribe las etiquetas ICD-11 correspondientes a un array de códigos en una columna
+' a partir de una celda inicial, mostrando el progreso en el formulario.
 Private Sub WriteICD11LabelsToRange(ByVal arr As Variant, ByVal startCell As Range, ByRef frm As FrmProgress)
   Dim code As String, label As String
   Dim outputArr() As Variant
@@ -242,7 +254,7 @@ Private Sub WriteICD11LabelsToRange(ByVal arr As Variant, ByVal startCell As Ran
   totalItems = UBound(arr) - LBound(arr) + 1
   ReDim outputArr(1 To totalItems, 1 To 1)
   
-  LogMessage "Starting ICD-11 label retrieval for " & totalItems & " codes..."
+  LogMessage "Iniciando bucle de recuperación de etiquetas ICD-11 para " & totalItems & " códigos..."
   
   idx = 1
   For i = LBound(arr) To UBound(arr)
@@ -258,6 +270,6 @@ Private Sub WriteICD11LabelsToRange(ByVal arr As Variant, ByVal startCell As Ran
   Next i
   
   startCell.Resize(totalItems, 1).Value = outputArr
-  LogMessage "ICD-11 label retrieval completed for " & totalItems & " codes."
+  LogMessage "Recuperación de etiquetas ICD-11 completada para " & totalItems & " códigos."
 End Sub
 

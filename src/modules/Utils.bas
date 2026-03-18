@@ -10,7 +10,7 @@ Public Enum LogLevel
   LOG_DEBUG = 3
 End Enum
 
-' Logs messages with optional severity
+' Registra mensajes con severidad opcional
 Public Sub LogMessage(msg As String, Optional level As LogLevel = LOG_INFO)
   Dim prefix As String
   Dim timeStamp As String
@@ -27,13 +27,13 @@ Public Sub LogMessage(msg As String, Optional level As LogLevel = LOG_INFO)
   
   Debug.Print timeStamp & " " & prefix & msg
   
-  ' Add to progress form log if frm is assigned
+  ' Agrega al registro del formulario de progreso si frm está asignado
   If Not frm Is Nothing Then
     frm.AddLog timeStamp, prefix, msg, level
   End If
 End Sub
 
-' Temporarily disables application settings for performance
+' Deshabilita temporalmente configuraciones de la aplicación para mejorar el rendimiento
 Public Sub DisableApplicationSettings(ByVal disable As Boolean)
   If disable Then
     Application.ScreenUpdating = False
