@@ -45,14 +45,14 @@ Public Function GetICD11CodeLabel(ByVal code As String) As String
 
   token = GetICD11AccessToken()
   If token = "" Then
-    LogMessage "GetICD11CodeLabel: Unable to retrieve access token.", LOG_ERROR
-    GetICD11CodeLabel = "Error: Unable to retrieve access token."
+    LogMessage "GetICD11CodeLabel: No se pudo obtener el token de acceso.", LOG_ERROR
+    GetICD11CodeLabel = "Error: No se pudo obtener el token de acceso."
     Exit Function
   End If
 
   If Not IsValidICD11Code(code) Then
-    LogMessage "GetICD11CodeLabel: Invalid ICD-11 code format: " & code, LOG_WARNING
-    GetICD11CodeLabel = "Error: Invalid ICD-11 code format."
+    LogMessage "GetICD11CodeLabel: Formato de código ICD-11 inválido: " & code, LOG_WARNING
+    GetICD11CodeLabel = "Error: Formato de código ICD-11 inválido."
     Exit Function
   End If
 
@@ -72,21 +72,21 @@ Public Function GetICD11CodeLabel(ByVal code As String) As String
   http.Send
 
   If http.Status <> 200 Then
-    LogMessage "GetICD11CodeLabel: API request failed. Status=" & http.Status & " URL=" & url, LOG_ERROR
-    GetICD11CodeLabel = "Error: API request failed with status " & http.Status
+    LogMessage "GetICD11CodeLabel: La solicitud a la API falló. Estado=" & http.Status & " URL=" & url, LOG_ERROR
+    GetICD11CodeLabel = "Error: La solicitud a la API falló con el estado " & http.Status
     Exit Function
   End If
 
   jsonResponse = http.responseText
-  LogMessage "GetICD11CodeLabel: JSON response length=" & Len(jsonResponse), LOG_DEBUG
+  LogMessage "GetICD11CodeLabel: Longitud de la respuesta JSON=" & Len(jsonResponse), LOG_DEBUG
 
   label = ParseJSONValue(jsonResponse, """label"":""", """")
   If label <> "" Then
     label = DecodeUnicode(label)
     GetICD11CodeLabel = label
   Else
-    LogMessage "GetICD11CodeLabel: Label not found in response for code " & code & ". JSON excerpt: " & Left(jsonResponse, 300), LOG_WARNING
-    GetICD11CodeLabel = "Error: Label not found for code " & code
+    LogMessage "GetICD11CodeLabel: No se encontró la etiqueta en la respuesta para el código " & code & ". Extracto JSON: " & Left(jsonResponse, 300), LOG_WARNING
+    GetICD11CodeLabel = "Error: No se encontró la etiqueta para el código " & code
   End If
 
   Exit Function
@@ -96,7 +96,7 @@ ErrHandler:
   GetICD11CodeLabel = "Error: " & Err.Description
 End Function
 
-' Gets (and caches) the access token for the ICD API
+' Obtiene (y almacena en caché) el token de acceso para la API de ICD
 Private Function GetICD11AccessToken() As String
   Static cachedToken As String
   Static tokenExpiry As Date
@@ -130,13 +130,13 @@ Private Function GetICD11AccessToken() As String
   http.Send postData
 
   If http.Status <> 200 Then
-    LogMessage "GetICD11AccessToken: Token request failed with status " & http.Status & ". Response: " & Left(http.responseText, 300), LOG_ERROR
+    LogMessage "GetICD11AccessToken: La solicitud de token falló con el estado " & http.Status & ". Respuesta: " & Left(http.responseText, 300), LOG_ERROR
     GetICD11AccessToken = ""
     Exit Function
   End If
 
   jsonResponse = http.responseText
-  LogMessage "GetICD11AccessToken: token response length=" & Len(jsonResponse), LOG_DEBUG
+  LogMessage "GetICD11AccessToken: Longitud de la respuesta del token=" & Len(jsonResponse), LOG_DEBUG
 
   token = ParseJSONValue(jsonResponse, """access_token"":""", """")
   expiresInText = ParseJSONValue(jsonResponse, """expires_in"":", ",")
@@ -154,7 +154,7 @@ Private Function GetICD11AccessToken() As String
     tokenExpiry = DateAdd("s", expiresIn - 60, Now) ' 60s como buffer
     GetICD11AccessToken = cachedToken
   Else
-    LogMessage "GetICD11AccessToken: access_token not found in response. JSON excerpt: " & Left(jsonResponse, 300), LOG_ERROR
+    LogMessage "GetICD11AccessToken: No se encontró el access_token en la respuesta. Extracto JSON: " & Left(jsonResponse, 300), LOG_ERROR
     GetICD11AccessToken = ""
   End If
 
