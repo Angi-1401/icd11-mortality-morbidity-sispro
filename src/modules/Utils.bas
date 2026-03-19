@@ -20,8 +20,8 @@ Public Sub LogMessage(msg As String, Optional level As LogLevel = LOG_INFO)
   Select Case level
     Case LOG_INFO: prefix = "[INFO] "
     Case LOG_WARNING: prefix = "[WARN] "
-    Case LOG_ERROR: prefix = "[ERROR]"
-    Case LOG_DEBUG: prefix = "[DEBUG]"
+    Case LOG_ERROR: prefix = "[ERROR] "
+    Case LOG_DEBUG: prefix = "[DEBUG] "
     Case Else: prefix = "[INFO] "
   End Select
   

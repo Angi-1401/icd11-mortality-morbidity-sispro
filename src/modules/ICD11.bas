@@ -4,36 +4,7 @@ Option Explicit
 Public Const CLIENT_ID As String = "TU_CLIENT_ID_AQUI"
 Public Const CLIENT_SECRET As String = "TU_CLIENT_SECRET_AQUI"
 
-' Extrae un posible código ICD-11 de una cadena que contiene un guion antes del código.
-Public Function ExtractICD11Code(ByVal str As String) As String
-  Dim dashPos As Long
-  Dim segment As String
-  Dim i As Long
-  Dim ch As String
-  Dim code As String
-
-  dashPos = InStrRev(str, "-")
-  If dashPos > 0 Then
-    segment = Mid$(str, dashPos + 1)
-  Else
-    Exit Function
-  End If
-
-  code = ""
-  For i = 1 To Len(segment)
-    ch = Mid$(segment, i, 1)
-    ' Permite letras, números, espacios, ampersands, barras y puntos
-    If ch Like "[A-Za-z0-9 &/\.]" Then
-      code = code & ch
-    End If
-  Next i
-
-  ' Reemplaza espacios por puntos
-  code = Replace(code, " ", ".")
-  ExtractICD11Code = code
-End Function
-
-' Recupera la etiqueta de un código ICD-11 usando el endpoint de descripción.
+' Recupera la etiqueta de un código ICD-11 usando el endpoint de descripción
 Public Function GetICD11CodeLabel(ByVal code As String) As String
   Dim http As Object
   Dim token As String
@@ -46,20 +17,19 @@ Public Function GetICD11CodeLabel(ByVal code As String) As String
   token = GetICD11AccessToken()
   If token = "" Then
     LogMessage "GetICD11CodeLabel: No se pudo obtener el token de acceso.", LOG_ERROR
-    GetICD11CodeLabel = "Error: No se pudo obtener el token de acceso."
+    GetICD11CodeLabel = "Error: No se pudo obtener el token de acceso"
     Exit Function
   End If
 
   If Not IsValidICD11Code(code) Then
     LogMessage "GetICD11CodeLabel: Formato de código ICD-11 inválido: " & code, LOG_WARNING
-    GetICD11CodeLabel = "Error: Formato de código ICD-11 inválido."
+    GetICD11CodeLabel = "Error: Formato de código ICD-11 inválido"
     Exit Function
   End If
 
   ' Codifica en URL los caracteres problemáticos
   code = Replace(code, "&", "%26")
   code = Replace(code, "/", "%2F")
-  code = Replace(code, " ", "%20")
 
   url = "https://id.who.int/icd/release/11/2025-01/mms/describe?code=" & code
 
@@ -165,16 +135,26 @@ ErrHandler:
   GetICD11AccessToken = ""
 End Function
 
-' Valida el formato básico del código ICD-11 (letras/números, con segmentos separados por puntos)
+' Valida el formato básico del código ICD-11 usando una expresión regular.
+' No garantiza que el código exista, solo que tiene un formato plausible.
 Private Function IsValidICD11Code(ByVal code As String) As Boolean
   Dim regex As Object
   Set regex = CreateObject("VBScript.RegExp")
 
-  regex.Pattern = "^[A-Za-z0-9]+(\.[A-Za-z0-9&/]+)*$"
-  regex.IgnoreCase = True
-  regex.Global = False
+  Dim pattern As String
+  pattern = "^[A-Z0-9]{4,}(\.[A-Z0-9]+)?([&/][A-Z0-9]{4,}(\.[A-Z0-9]+)?)*$"
 
-  IsValidICD11Code = regex.Test(code)
+  With regex
+    .pattern = pattern
+    .IgnoreCase = False
+    .Global = True
+  End With
+
+  If code = "" Then
+    IsValidICD11Code = False
+  Else
+    IsValidICD11Code = regex.Test(code)
+  End If
 End Function
 
 ' Extrae el valor entre startTag y endTag. Devuelve cadena vacía si no se encuentra startTag.
@@ -235,3 +215,4 @@ Private Function DecodeUnicode(ByVal str As String) As String
 
   DecodeUnicode = str
 End Function
+

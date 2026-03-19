@@ -1,4 +1,3 @@
-Attribute VB_Name = "TableOperations"
 Option Explicit
 
 Public Const WORKSHEET_NAME As String = "Datasheet"
@@ -45,7 +44,7 @@ Public Sub PopulateTableFromTXT()
 
   Dim userResponse As VbMsgBoxResult
 
-  importedCols = Array(3, 6, 12, 13, 15, 17, 19, 22, 23, 24, 25, 27, 28, 29, 30, 32, 34, 36, 38, 41, 42, 44, 46, 48, 52, 56, 130, 132, 134, 136)
+  importedCols = Array(3, 6, 12, 13, 15, 17, 19, 22, 23, 24, 25, 27, 28, 29, 30, 32, 34, 36, 38, 41, 42, 44, 46, 48, 52, 56, 130, 131, 132, 133, 134, 135, 136, 137)
 
   filePath = Application.GetOpenFilename("Text Files (*.txt), *.txt", , "Select text file to import")
   If filePath = "False" Then Exit Sub ' Usuario cancela la operación
@@ -116,26 +115,11 @@ Public Sub PopulateTableFromTXT()
     If userResponse = vbNo Then GoTo Cleanup
   End If
 
-  ' Redimensiona la tabla para acomodar el número de filas importadas y
-  ' luego inserta los datos procesados en la tabla.
-  tbl.Resize tbl.Range.Resize(k + 1)
+  ' Ingresa los datos procesados en la tabla, comenzando desde la primera fila de datos (después del encabezado).
+   tbl.Resize tbl.Range.Resize(k + 1)
 
   Set targetRange = tbl.DataBodyRange.Resize(k, importedCols)
   targetRange.Value = dataOut
-
-  startCol = 27
-  endCol = 30
-
-  data = tbl.DataBodyRange.Value
-  ReDim result(1 To UBound(data, 1), 1 To endCol - startCol + 1)
-
-  For i = 1 To UBound(data, 1)
-    For j = startCol To endCol
-      result(i, j - startCol + 1) = ExtractICD11Code(CStr(data(i, j)))
-    Next j
-  Next i
-
-  tbl.DataBodyRange.Columns(31).Resize(, endCol - startCol + 1).Value = result
     
   MsgBox "Importación completa: " & k & " filas insertadas en '" & TABLE_NAME & "'.", vbInformation
 

@@ -22,7 +22,7 @@ Public Sub ClearReport()
 
   DisableApplicationSettings False
 
-  MsgBox "Report cleared successfully!", vbInformation
+  MsgBox "¡Reporte borrado exitosamente!", vbInformation
 End Sub
 
 ' Genera el reporte de mortalidad y morbilidad basado en los datos de entrada y los filtros definidos.
@@ -40,12 +40,12 @@ Public Sub GenerateReport()
   Dim topArr As Variant
   Dim i As Long
 
-  Dim frm As FrmProgress
+  Dim frm As frmProgress
   Dim TotalSteps As Long
   Dim CurrentStep As Long
   
   ' Inicializa el formulario de progreso
-  Set frm = New FrmProgress
+  Set frm = New frmProgress
   frm.Show vbModeless
   Set Utils.frm = frm
   
@@ -99,8 +99,8 @@ Public Sub GenerateReport()
     frm.CurrentStep = frm.CurrentStep + 12
     frm.UpdateProgress frm.CurrentStep, frm.TotalSteps
 
-    WriteICD11LabelsToRange topArr, wsOutput.Range(outRanges(i)).Offset(0, 2), frm
-    LogMessage "Etiquetas ICD-11 escritas en " & wsOutput.Range(outRanges(i)).Offset(0, 2).Address
+    WriteICD11LabelsToRange topArr, wsOutput.Range(outRanges(i)).Offset(0, 1), frm
+    LogMessage "Etiquetas ICD-11 escritas en " & wsOutput.Range(outRanges(i)).Offset(0, 1).Address
 
     frm.CurrentStep = frm.CurrentStep + 13
     frm.UpdateProgress frm.CurrentStep, frm.TotalSteps
@@ -242,7 +242,7 @@ End Sub
 
 ' Escribe las etiquetas ICD-11 correspondientes a un array de códigos en una columna
 ' a partir de una celda inicial, mostrando el progreso en el formulario.
-Private Sub WriteICD11LabelsToRange(ByVal arr As Variant, ByVal startCell As Range, ByRef frm As FrmProgress)
+Private Sub WriteICD11LabelsToRange(ByVal arr As Variant, ByVal startCell As Range, ByRef frm As frmProgress)
   Dim code As String, label As String
   Dim outputArr() As Variant
   Dim totalItems As Long
